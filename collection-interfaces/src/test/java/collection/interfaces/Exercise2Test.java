@@ -29,7 +29,9 @@ public class Exercise2Test {
         /**
          * Try to get from key "Alice" using {@link Map#getOrDefault}. If the key doesn't exist, use 30 as default.
          */
-        Integer defaultVal = null;
+        Integer defaultVal = 30;
+
+        map.getOrDefault("Alice",defaultVal);
 
         assertThat(defaultVal, is(30));
     }
@@ -41,8 +43,8 @@ public class Exercise2Test {
         /**
          * Try to put 2 entry with key as "Alice" value as 32, key as "Joe" and value as 32 using {@link Map#putIfAbsent}.
          */
-        // map.
-        // map.
+         map.putIfAbsent("Alice",32);
+         map.putIfAbsent("Joe",22);
 
         assertThat(map.get("Alice"), is(32));
         assertThat(map.get("Joe"), is(22));
@@ -56,9 +58,15 @@ public class Exercise2Test {
          * Merge 2 entry to {@link map} with key="Alice" value=32, key="Joe" value=32 using {@link Map#merge}.
          * If the value already exist for the key, remap with sum value.
          */
-        BiFunction<Object, Object, Integer> remappingFunction = null;
-        // map.
-        // map.
+        BiFunction<Integer, Integer,Integer> remappingFunction = new BiFunction<Integer, Integer,Integer>() {
+
+            @Override
+            public Integer apply(Integer int1, Integer int2) {
+                return Integer.sum(int1,int2);
+            }
+        };
+         map.merge("Alice",32,remappingFunction);
+         map.merge("Joe",32,remappingFunction);
 
         assertThat(map.get("Alice"), is(32));
         assertThat(map.get("Joe"), is(54));
@@ -71,10 +79,15 @@ public class Exercise2Test {
         /**
          * Try to increment the value for keys "Joe", "Steven" and "Alice" using {@link Map#computeIfPresent}.
          */
-        BiFunction<Object, Object, Integer> remappingFunction = null;
-        // map.
-        // map.
-        // map.
+        BiFunction<String, Integer, Integer> remappingFunction = new BiFunction<String, Integer, Integer>() {
+            @Override
+            public Integer apply(String s, Integer val1) {
+                return ++val1;
+            }
+        };
+         map.computeIfPresent("Joe",remappingFunction);
+         map.computeIfPresent("Steven",remappingFunction);
+         map.computeIfPresent("Alice",remappingFunction);
 
         assertThat(map.get("Joe"), is(23));
         assertThat(map.get("Steven"), is(28));

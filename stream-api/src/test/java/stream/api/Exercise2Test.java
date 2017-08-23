@@ -19,78 +19,93 @@ import static org.junit.Assert.*;
 
 public class Exercise2Test extends ClassicOnlineStore {
 
-    @Easy @Test
+    @Easy
+    @Test
     public void sortByAge() {
-        List<Customer> customerList = this.mall.getCustomerList();
+        List <Customer> customerList = this.mall.getCustomerList ();
 
         /**
          * Create a stream with ascending ordered age values.
          * Use {@link Stream#sorted} to sort them.
          */
-        Stream<Integer> sortedAgeStream = null;
-
-        List<Integer> sortedAgeList = sortedAgeStream.collect(Collectors.toList());
-        assertThat(sortedAgeList, contains(21, 22, 22, 26, 27, 28, 32, 35, 36, 38));
+        Stream <Integer> sortedAgeStream = customerList.stream ()
+                .map (customer -> customer.getAge ())
+                .sorted ((age1, age2) -> age1.compareTo (age2));
+        List <Integer> sortedAgeList = sortedAgeStream.collect (Collectors.toList ());
+        assertThat (sortedAgeList, contains (21, 22, 22, 26, 27, 28, 32, 35, 36, 38));
     }
 
-    @Easy @Test
+    @Easy
+    @Test
     public void descSortByAge() {
-        List<Customer> customerList = this.mall.getCustomerList();
+        List <Customer> customerList = this.mall.getCustomerList ();
 
         /**
          * Create a stream with descending ordered age values.
          */
-        Comparator<Integer> descOrder = null;
-        Stream<Integer> sortedAgeStream = null;
+        Comparator <Integer> descOrder = (v1, v2) -> {
+            return v2.compareTo (v1);
+        };
+        Stream <Integer> sortedAgeStream = customerList.stream ().map (customer -> customer.getAge ()).sorted (descOrder);
 
-        assertTrue(AssertUtil.isLambda(descOrder));
-        List<Integer> sortedAgeList = sortedAgeStream.collect(Collectors.toList());
-        assertThat(sortedAgeList, contains(38, 36, 35, 32, 28, 27, 26, 22, 22, 21));
+        assertTrue (AssertUtil.isLambda (descOrder));
+        List <Integer> sortedAgeList = sortedAgeStream.collect (Collectors.toList ());
+        assertThat (sortedAgeList, contains (38, 36, 35, 32, 28, 27, 26, 22, 22, 21));
     }
 
-    @Easy @Test
+    @Easy
+    @Test
     public void top3RichCustomer() {
-        List<Customer> customerList = this.mall.getCustomerList();
+        List <Customer> customerList = this.mall.getCustomerList ();
 
         /**
          * Create a stream with top 3 rich customers using {@link Stream#limit} to limit the size of the stream
          */
-        Stream<String> top3RichCustomerStream = null;
+        Stream <String> top3RichCustomerStream = customerList.stream ()
+                .sorted ((cust1, cust2) -> {
+                             return cust2.getBudget ().compareTo (cust1.getBudget ());
+                         }
+                        ).map (customer -> customer.getName ()).limit (3);
 
-        List<String> top3RichCustomerList = top3RichCustomerStream.collect(Collectors.toList());
-        assertThat(top3RichCustomerList, contains("Diana", "Andrew", "Chris"));
+        List <String> top3RichCustomerList = top3RichCustomerStream.collect (Collectors.toList ());
+        assertThat (top3RichCustomerList, contains ("Diana", "Andrew", "Chris"));
     }
 
-    @Easy @Test
+    @Easy
+    @Test
     public void distinctAge() {
-        List<Customer> customerList = this.mall.getCustomerList();
+        List <Customer> customerList = this.mall.getCustomerList ();
 
         /**
          * Create a stream with distinct age values using {@link Stream#distinct}
          */
-        Stream<Integer> distinctAgeStream = null;
+        Stream <Integer> distinctAgeStream = customerList.stream ().map (customer -> customer.getAge ()).distinct ();
 
-        List<Integer> distinctAgeList = distinctAgeStream.collect(Collectors.toList());
-        assertThat(distinctAgeList, contains(22, 27, 28, 38, 26, 32, 35, 21, 36));
+        List <Integer> distinctAgeList = distinctAgeStream.collect (Collectors.toList ());
+        assertThat (distinctAgeList, contains (22, 27, 28, 38, 26, 32, 35, 21, 36));
     }
 
-    @Easy @Test
+    @Easy
+    @Test
     public void itemsCustomersWantToBuy() {
-        List<Customer> customerList = this.mall.getCustomerList();
+        List <Customer> customerList = this.mall.getCustomerList ();
 
         /**
          * Create a stream with items' names stored in {@link Customer.wantToBuy}
          * Use {@link Stream#flatMap} to create a stream from each element of a stream.
          */
-        Function<Customer, Stream<Item>> getItemStream = null;
-        Stream<String> itemStream = null;
+        Function <Customer, Stream <String>> getItemStream = customer -> {
 
-        assertTrue(AssertUtil.isLambda(getItemStream));
-        List<String> itemList = itemStream.collect(Collectors.toList());
-        assertThat(itemList,
-                   contains("small table", "plate", "fork", "ice cream", "screwdriver", "cable", "earphone", "onion",
-                            "ice cream", "crisps", "chopsticks", "cable", "speaker", "headphone", "saw", "bond",
-                            "plane", "bag", "cold medicine", "chair", "desk", "pants", "coat", "cup", "plate", "fork",
-                            "spoon", "ointment", "poultice", "spinach", "ginseng", "onion"));
+            return customer.getWantToBuy ().stream ().map (x -> x.getName ());
+        };
+        Stream <String> itemStream = customerList.stream ().flatMap (getItemStream);
+
+        assertTrue (AssertUtil.isLambda (getItemStream));
+        List <String> itemList = itemStream.collect (Collectors.toList ());
+        assertThat (itemList,
+                    contains ("small table", "plate", "fork", "ice cream", "screwdriver", "cable", "earphone", "onion",
+                              "ice cream", "crisps", "chopsticks", "cable", "speaker", "headphone", "saw", "bond",
+                              "plane", "bag", "cold medicine", "chair", "desk", "pants", "coat", "cup", "plate", "fork",
+                              "spoon", "ointment", "poultice", "spinach", "ginseng", "onion"));
     }
 }
